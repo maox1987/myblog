@@ -1,0 +1,28 @@
+{
+  "name": "myblog",
+  "version": "0.0.1",
+  "description": "myblog",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "blog"
+  ],
+  "author": "maox1987@163.com",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^1.1.0",
+    "cookie-parser": "^1.4.1",
+    "crypto": "0.0.3",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "jade": "^1.11.0",
+    "mongodb": "^2.1.7",
+    "morgan": "^1.7.0",
+    "serve-favicon": "^2.3.0"
+  }
+}

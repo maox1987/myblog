@@ -1,0 +1,17 @@
+//
+   Created by MaoX on 2016/3/10.
+
+extends header
+
+block content
+    form(method="post")
+        div
+            div 标题
+            div
+                input(type="text" name="title")
+        div
+            div 正文
+            div
+                textarea(name="post" rows="20" cols="100")
+        div
+            input(type="submit" value="发表")
