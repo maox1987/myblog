@@ -3,8 +3,9 @@
  */
 var crypto = require('crypto');
 var User = require('../models/user');
-var Post = require('../models/post');
 var multer = require('multer');//文件上传
+var Article = require('../models/Article');
+
 var upload = multer({
     storage:multer.diskStorage({
         destination:function(req,file,cb){
@@ -18,16 +19,16 @@ var upload = multer({
 
 module.exports = function(app){
     app.get('/',function(req,res){
-        Post.getAll(null,function(err,posts){
+        Article.find({},function(err,articles){
             if(err){
-                posts =[];
+                articles =[];
             }
             res.render('index',{
                 title:'主页',
                 user:req.session.user,
                 success:req.flash('success').toString(),
                 error:req.flash('error').toString(),
-                posts:posts
+                articles:articles
             });
         });
 
@@ -60,7 +61,7 @@ module.exports = function(app){
             email:req.body.email
         });
 
-        User.get(newUser.name,function(err,user){
+        User.findOne({name:newUser.name},function(err,user){
             if(err){
                 req.flash('error',err);
                 return res.redirect('/');
@@ -95,7 +96,7 @@ module.exports = function(app){
         var md5 = crypto.createHash('md5');
         var password = md5.update(req.body.password).digest('hex');
 
-        User.get(req.body.name,function(err,user){
+        User.findOne({name:req.body.name},function(err,user){
             if(!user){
                 req.flash('error','用户不存在！');
                 return res.redirect('/login');
@@ -122,10 +123,12 @@ module.exports = function(app){
     });
 
     app.post('/post',checkLogin, function(req,res){
-        var currentUser =req.session.user;
-        var post = new Post(currentUser.name,req.body.title,req.body.post);
 
-        post.save(function(err){
+        var article = new Article(req.body.article);
+        article.author = req.session.user.name;
+
+
+        article.save(function(err,article){
             if(err){
                 req.flash('error',err);
                 return res.redirect('/');
@@ -157,20 +160,20 @@ module.exports = function(app){
     });
 
     app.get('/u/:name',function(req,res){
-        User.get(req.params.name,function(err,user){
+        User.findOne({name:req.params.name},function(err,user){
             if(!user){
                 req.flash('error','用户不存在！');
                 return res.redirect('/');
             }
 
-            Post.getAll(user.name,function(err,posts){
+            Article.find({author:user.name},function(err,articles){
                 if(err){
                     req.flash('error',err);
                     return res.redirect('/');
                 }
                 res.render('user',{
                     title:user.name,
-                    posts:posts,
+                    articles:articles,
                     success:req.flash('success').toString(),
                     error:req.flash('error').toString()
                 });
@@ -179,15 +182,15 @@ module.exports = function(app){
     });
 
 
-    app.get('/u/:name/:day/:title',function(req,res){
-        Post.getOne(req.params.name,req.params.day,req.params.title,function(err,post){
+    app.get('/article/:id',function(req,res){
+        Article.findOne({_id:req.params.id},function(err,article){
             if(err){
                 req.flash('error',err);
                 return res.redirect('/');
             }
             res.render('article',{
-                title:req.params.title,
-                post:post,
+                title:article.title,
+                article:article,
                 user:req.session.user,
                 success:req.flash('success').toString(),
                 error:req.flash('error').toString()

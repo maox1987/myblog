@@ -6,6 +6,6 @@ extends header
 block content
     p.info
         | 作者：
-        a(href="/u/#{post.name}") #{post.name}
-        | &nbsp;| 日期：#{post.time.minute}
-        p !{post.post}
+        a(href="/u/#{article.author}") #{article.author}
+        | &nbsp;| 日期：#{moment(article.meta.createAt).format('lll')}
+    p #{article.content}
