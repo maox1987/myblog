@@ -4,6 +4,5 @@
 
 ***采用了node.js+express+mongodb***
 todo:
-- 引入mongoose,bootstrap
-- 文章内容采用前端markdown显示
+- 引入bootstrap
 - 优化图片上传模块

@@ -1,0 +1,16 @@
+//
+   Created by MaoX on 2016/3/11.
+
+extends header
+
+block content
+    p
+        span
+            a.edit(href="/article/#{article._id}/edit") 编辑
+        span
+            a.edit(href="/article/#{article._id}/remove") 删除
+    p.info
+        | 作者：
+        a(href="/u/#{article.author}") #{article.author}
+        | &nbsp;| 日期：#{moment(article.meta.createAt).format('lll')}
+    p !{markdown.toHTML(article.content)}

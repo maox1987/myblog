@@ -3,14 +3,12 @@
 extends header
 
 block content
-    for item in posts
+    for item in articles
         p
             h2
-                a(href="#") #{item.title}
+                a(href="/article/#{item._id}") #{item.title}
         p.info
             | 作者：
-            a(href="#") #{item.name}
-            | &nbsp;| 日期：#{item.time.minute}
-        p !{item.post}
-
-
+            a(href="/u/#{item.author}") #{item.author}
+            | &nbsp;| 日期：#{moment(item.meta.createAt).format('lll')}
+        p !{markdown.toHTML(item.content)}
