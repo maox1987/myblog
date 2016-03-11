@@ -198,6 +198,44 @@ module.exports = function(app){
         });
     });
 
+    app.get('/article/:id/edit',checkLogin,function(req,res){
+        Article.findById(req.params.id,function(err,article){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('/');
+            }
+            res.render('edit',{
+                title:'编辑',
+                article:article,
+                user:req.session.user,
+                success:req.flash('success').toString(),
+                error:req.flash('error').toString()
+            })
+        })
+    });
+
+    app.post('/article/:id/edit',checkLogin,function(req,res){
+        var article = req.body.article;
+        Article.update({_id:req.params.id},{$set:article},function(err){
+            if(err){
+                req.flash('error',err);
+                return res.redirect();
+            }
+            req.flash('success','修改成功！');
+            res.redirect('/');
+        });
+    });
+
+    app.get('/article/:id/remove',checkLogin,function(req,res){
+        Article.remove({_id:req.params.id},function(err,article){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('back');
+            }
+            req.flash('success','删除成功！');
+            res.redirect('/');
+        })
+    });
     function checkLogin(req,res,next){
         if(!req.session.user){
             req.flash('error','未登录！');

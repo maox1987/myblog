@@ -1,0 +1,15 @@
+//
+   Created by MaoX on 2016/3/11.
+
+extends header
+
+block content
+    form(method="post" action="/article/#{article._id}/edit")
+        div
+            div 标题：
+            input(type="text" name="article[title]" value="#{article.title}")
+        div
+            div 正文：
+            textarea(name="article[content]" rows="20" cols="100") #{article.content}
+        div
+            input(type="submit" value="保存修改")
