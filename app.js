@@ -3,13 +3,14 @@
  */
 var express = require('express');
 var path = require('path');
-var logger = require('morgan');
+var logger = require('morgan');//日志
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
+var MongoStore = require('connect-mongo')(session);//保存session到mongodb
 var favicon = require('serve-favicon');
 var routes = require('./routes/index');
+
 
 var app = express();
 var settings = require('./settings');
@@ -18,6 +19,7 @@ var flash = require('connect-flash');
 app.set('port',process.env.PORT || 3000);
 app.set('views', path.join(__dirname,'views'));
 app.set('view engine', 'jade');
+
 
 app.use(flash());
 app.use(session({
