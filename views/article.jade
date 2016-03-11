@@ -8,4 +8,4 @@ block content
         | 作者：
         a(href="/u/#{article.author}") #{article.author}
         | &nbsp;| 日期：#{moment(article.meta.createAt).format('lll')}
-    p #{article.content}
+    p !{markdown.toHTML(article.content)}

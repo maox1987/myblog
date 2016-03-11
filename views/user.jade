@@ -11,5 +11,5 @@ block content
             p.info
                 | 作者：
                 a(href="/u/#{item.author}") #{item.author}
-                | &nbsp;| 日期：#{item.meta.createAt.toString("yyyy/MM/dd")}
-            p #{item.content}
+                | &nbsp;| 日期：#{moment(item.meta.createAt).format('lll')}
+            p !{markdown.toHTML(item.content)}

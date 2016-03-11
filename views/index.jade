@@ -11,6 +11,4 @@ block content
             | 作者：
             a(href="/u/#{item.author}") #{item.author}
             | &nbsp;| 日期：#{moment(item.meta.createAt).format('lll')}
-        p #{item.content}
-
-
+        p !{markdown.toHTML(item.content)}

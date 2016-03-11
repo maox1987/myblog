@@ -1,0 +1,24 @@
+{
+  "name": "myblog",
+  "description": "myblog",
+  "main": "app.js",
+  "authors": [
+    "maox1987@163.com"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "blog"
+  ],
+  "homepage": "https://github.com/maox1987/myblog",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {}
+}

@@ -16,7 +16,7 @@ var app = express();
 var settings = require('./settings');
 var flash = require('connect-flash');
 var moment = require('moment');
-
+var markdown = require('markdown').markdown;
 //连接数据库
 var dbUrl = 'mongodb://localhost:27017/blog';
 mongoose.connect(dbUrl);
@@ -67,7 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 routes(app);
 moment.locale('zh-cn');
 app.locals.moment = moment;
-
+app.locals.markdown = markdown;
 app.listen(app.get('port'), function(){
     console.log('Express server listening on port '+app.get('port'));
 });
