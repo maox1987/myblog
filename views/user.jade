@@ -1,0 +1,15 @@
+//
+   Created by MaoX on 2016/3/11.
+
+extends header
+
+block content
+    for post in posts
+        p
+            h2
+                a(href="/u/#{post.name}/#{post.time.day}/#{post.title}") #{post.title}
+            p.info
+                | 作者：
+                a(href="/u/#{post.name}") #{post.name}
+                | &nbsp;| 日期：#{post.time.minute}
+            p !{post.post}
