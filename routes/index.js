@@ -4,7 +4,8 @@
 var crypto = require('crypto');
 var User = require('../models/user');
 var multer = require('multer');//文件上传
-var Article = require('../models/Article');
+var Article = require('../models/article');
+var Comment = require('../models/comments');
 
 var upload = multer({
     storage:multer.diskStorage({
@@ -183,7 +184,9 @@ module.exports = function(app){
 
 
     app.get('/article/:id',function(req,res){
-        Article.findOne({_id:req.params.id},function(err,article){
+        Article.findOne({_id:req.params.id})
+            .populate('comments')
+            .exec(function(err,article){
             if(err){
                 req.flash('error',err);
                 return res.redirect('/');
@@ -235,6 +238,39 @@ module.exports = function(app){
             req.flash('success','删除成功！');
             res.redirect('/');
         })
+    });
+
+    app.post('/article/:id/comment',checkLogin,function(req,res){
+        Article.findById(req.params.id,function(err,article){
+            if(err){
+                req.flash('error',err);
+                return res.redirect();
+            }
+            if(!article){
+                req.flash('error','文章不存在');
+                return res.redirect();
+            }
+            var comment = new Comment({
+                content:req.body.content,
+                from:req.session.user.name
+            });
+
+            comment.save(function(err,comment){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect();
+                }
+                article.comments.push(comment);
+                article.save(function(err){
+                    if(err){
+                        req.flash('error',err);
+                        return res.redirect();
+                    }
+                    req.flash('success','提交成功！');
+                    return res.redirect('back');
+                });
+            });
+        });
     });
     function checkLogin(req,res,next){
         if(!req.session.user){

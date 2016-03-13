@@ -1,0 +1,16 @@
+//
+   Created by MaoX on 2016/3/12.
+
+for comment in article.comments
+    p
+        a(href="/u/#{comment.from}") #{comment.from}
+        span.info 回复于 #{moment(comment.meta.createAt).format("lll")}
+    p !{markdown.toHTML(comment.content)}
+    hr
+    br
+form(method="post" action="/article/#{article._id}/comment")
+    div
+        textarea(name="content" rows="5" cols="80")
+    div
+        input(type="submit" value="留言")
+

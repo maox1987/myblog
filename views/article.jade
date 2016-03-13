@@ -14,3 +14,5 @@ block content
         a(href="/u/#{article.author}") #{article.author}
         | &nbsp;| 日期：#{moment(article.meta.createAt).format('lll')}
     p !{markdown.toHTML(article.content)}
+    hr
+    include comment

@@ -1,14 +1,11 @@
 /**
- * Created by MaoX on 2016/3/11.
+ * Created by MaoX on 2016/3/12.
  */
 var mongoose = require('mongoose');
-var ObjectId =mongoose.Schema.Types.ObjectId;
 
-var ArticleSchema = new mongoose.Schema({
-    title:String,
+var CommentSchema = new mongoose.Schema({
     content:String,
-    author:String,
-    comments:[{type:ObjectId,ref:'Comment'}],
+    from:String,
     meta:{
         createAt:{
             type:Date,
@@ -21,7 +18,7 @@ var ArticleSchema = new mongoose.Schema({
     }
 });
 
-ArticleSchema.pre('save',function(next){
+CommentSchema.pre('save',function(next){
     if(this.isNew){
         this.meta.createAt = this.meta.updateAt = Date.now();
     }else{
@@ -30,4 +27,4 @@ ArticleSchema.pre('save',function(next){
     next();
 });
 
-module.exports = ArticleSchema;
+module.exports = CommentSchema;
