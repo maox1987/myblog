@@ -20,6 +20,7 @@
     "crypto": "0.0.3",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "file-stream-rotator": "0.0.6",
     "jade": "^1.11.0",
     "markdown": "^0.5.0",
     "moment": "^2.12.0",
