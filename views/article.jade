@@ -13,6 +13,10 @@ block content
         | 作者：
         a(href="/u/#{article.author}") #{article.author}
         | &nbsp;| 日期：#{moment(article.meta.createAt).format('lll')}
+        | &nbsp;| 标签：
+        for tag in article.tags
+            if tag
+                a.tag(href="/tags/#{tag}") #{tag}
     p !{markdown.toHTML(article.content)}
     hr
     include comment

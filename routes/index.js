@@ -239,14 +239,26 @@ module.exports = function(app){
     });
 
     app.post('/article/:id/edit',checkLogin,function(req,res){
-        var article = req.body.article;
-        Article.update({_id:req.params.id},{$set:article},function(err){
+        var _article = req.body.article;
+        Article.findById(req.params.id,function(err,article){
             if(err){
                 req.flash('error',err);
-                return res.redirect();
+                return res.redirect('back');
             }
-            req.flash('success','修改成功！');
-            res.redirect('/');
+            if(!article){
+                req.flash('error','文章不存在！');
+                return res.redirect('back');
+            }
+            article.title = _article.title;
+            article.content = _article.content;
+            article.tags = _article.tags;
+            article.save(function(err){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('back');
+                }
+                res.redirect('/');
+            })
         });
     });
 
@@ -309,6 +321,39 @@ module.exports = function(app){
                 error:req.flash('error').toString()
             })
         });
+    });
+
+    app.get('/tags',function(req,res){
+        Article.getTags(function(err,tags){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('back');
+            }
+            res.render('tags',{
+                title:'标签',
+                tags:tags,
+                user:req.session.user,
+                success:req.flash('success').toString(),
+                error:req.flash('error').toString()
+            });
+        });
+    });
+
+    app.get('/tags/:tag',function(req,res){
+        Article.find({tags:req.params.tag}).select('title meta').sort('-meta.createAt')
+            .exec(function(err,articles){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('back');
+                }
+                res.render('tag',{
+                    title:'TAG:'+req.params.tag,
+                    articles:articles,
+                    user:req.session.user,
+                    success:req.flash('success').toString(),
+                    error:req.flash('error').toString()
+                });
+            });
     });
 
     function checkLogin(req,res,next){

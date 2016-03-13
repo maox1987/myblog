@@ -12,5 +12,9 @@ block content
             | 作者：
             a(href="/u/#{item.author}") #{item.author}
             | &nbsp;| 日期：#{moment(item.meta.createAt).format('lll')}
+            | &nbsp;| 标签：
+            for tag in article.tags
+                if tag
+                    a.tag(href="/tags/#{tag}") #{tag}
         p !{markdown.toHTML(item.content)}
     include paging

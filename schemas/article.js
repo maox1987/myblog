@@ -8,6 +8,7 @@ var ArticleSchema = new mongoose.Schema({
     title:String,
     content:String,
     author:String,
+    tags:[String],
     comments:[{type:ObjectId,ref:'Comment'}],
     meta:{
         createAt:{
@@ -27,7 +28,20 @@ ArticleSchema.pre('save',function(next){
     }else{
         this.meta.updateAt = Date.now();
     }
+    this.tags = this.tags.map(function(item){
+        return item.trim();
+    });
     next();
 });
 
 module.exports = ArticleSchema;
+
+ArticleSchema.statics.getTags = function(callback){
+    this.find({}).distinct('tags').exec(function(err,tags){
+        if(err){
+            return callback(err);
+        }
+
+        return callback(null,tags);
+    })
+};
