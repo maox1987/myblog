@@ -10,6 +10,10 @@ var ArticleSchema = new mongoose.Schema({
     author:String,
     tags:[String],
     comments:[{type:ObjectId,ref:'Comment'}],
+    pv:{
+        type:Number,
+        default:0
+    },
     meta:{
         createAt:{
             type:Date,

@@ -205,7 +205,7 @@ module.exports = function(app){
 
 
     app.get('/article/:id',function(req,res){
-        Article.findOne({_id:req.params.id})
+        Article.findByIdAndUpdate(req.params.id,{$inc:{pv:1}})
             .populate('comments')
             .exec(function(err,article){
             if(err){

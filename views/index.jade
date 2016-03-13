@@ -16,4 +16,5 @@ block content
                 if tag
                     a.tag(href="/tags/#{tag}") #{tag}
         p !{markdown.toHTML(article.content)}
+        p.info 阅读：#{article.pv} | 评论：#{article.comments.length}
     include paging
