@@ -265,11 +265,11 @@ module.exports = function(app){
         Article.findById(req.params.id,function(err,article){
             if(err){
                 req.flash('error',err);
-                return res.redirect();
+                return res.redirect('/');
             }
             if(!article){
                 req.flash('error','文章不存在');
-                return res.redirect();
+                return res.redirect('/');
             }
             var comment = new Comment({
                 content:req.body.content,
@@ -293,6 +293,24 @@ module.exports = function(app){
             });
         });
     });
+
+    app.get('/archive',function(req,res){
+
+        Article.find({}).select("_id meta title").sort('-meta.createAt').exec(function(err,articles){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('back');
+            }
+            res.render('archive',{
+                title:'存档',
+                articles:articles,
+                user:req.session.user,
+                success:req.flash('success').toString(),
+                error:req.flash('error').toString()
+            })
+        });
+    });
+
     function checkLogin(req,res,next){
         if(!req.session.user){
             req.flash('error','未登录！');
