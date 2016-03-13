@@ -12,3 +12,4 @@ block content
             a(href="/u/#{item.author}") #{item.author}
             | &nbsp;| 日期：#{moment(item.meta.createAt).format('lll')}
         p !{markdown.toHTML(item.content)}
+    include paging

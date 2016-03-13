@@ -20,18 +20,29 @@ var upload = multer({
 
 module.exports = function(app){
     app.get('/',function(req,res){
-        Article.find({},function(err,articles){
+        var page ={};
+        page.p = parseInt(req.query.p) || 0;
+        page.s = 10;
+        Article.count({},function(err,total){
             if(err){
-                articles =[];
+                return res.send(err);
             }
-            res.render('index',{
-                title:'主页',
-                user:req.session.user,
-                success:req.flash('success').toString(),
-                error:req.flash('error').toString(),
-                articles:articles
+            page.max = Math.ceil(total/page.s);
+            Article.find({}).skip(page.p*page.s).limit(page.s).sort('-meta.createAt').exec(function(err,articles){
+                if(err){
+                    articles =[];
+                }
+                res.render('index',{
+                    title:'主页',
+                    user:req.session.user,
+                    success:req.flash('success').toString(),
+                    error:req.flash('error').toString(),
+                    articles:articles,
+                    page:page
+                });
             });
         });
+
 
     });
 
@@ -167,16 +178,26 @@ module.exports = function(app){
                 return res.redirect('/');
             }
 
-            Article.find({author:user.name},function(err,articles){
+            var page ={};
+            page.p = parseInt(req.query.p) || 0;
+            page.s = 10;
+            Article.count({author:user.name},function(err,total){
                 if(err){
-                    req.flash('error',err);
-                    return res.redirect('/');
+                    return res.send(err);
                 }
-                res.render('user',{
-                    title:user.name,
-                    articles:articles,
-                    success:req.flash('success').toString(),
-                    error:req.flash('error').toString()
+                page.max = Math.ceil(total/page.s);
+                Article.find({author:user.name}).skip(page.p*page.s).limit(page.s).sort('-meta.createAt').exec(function(err,articles){
+                    if(err){
+                        articles =[];
+                    }
+                    res.render('index',{
+                        title:user.name,
+                        user:req.session.user,
+                        success:req.flash('success').toString(),
+                        error:req.flash('error').toString(),
+                        articles:articles,
+                        page:page
+                    });
                 });
             });
         });
