@@ -28,6 +28,9 @@ html
                     a(title="登录" href="/login") login
                 span
                     a(title="注册" href="/reg") register
+            span
+                form(method="get" action="/search")
+                    input.search(type="text" name="keyword" placeholder="SEARCH")
         article
             if success
                 div #{success}

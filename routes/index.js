@@ -356,6 +356,24 @@ module.exports = function(app){
             });
     });
 
+    app.get('/search',function(req,res){
+        var pattern = new RegExp(req.query.keyword.trim(),'i');
+        Article.find({title:pattern}).select('title meta').sort('-meta.createAt')
+            .exec(function(err,articles){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('back');
+                }
+                res.render('search',{
+                    title:'SEARCH:'+req.query.keyword,
+                    articles:articles,
+                    user:req.session.user,
+                    success:req.flash('success').toString(),
+                    error:req.flash('error').toString()
+                });
+            });
+    });
+
     function checkLogin(req,res,next){
         if(!req.session.user){
             req.flash('error','未登录！');
