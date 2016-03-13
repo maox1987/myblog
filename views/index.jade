@@ -7,6 +7,8 @@ block content
         p
             h2
                 a(href="/article/#{article._id}") #{article.title}
+            a(href="/u/#{article.author}")
+                img.r_head(src="#")
         p.info
             | 作者：
             a(href="/u/#{article.author}") #{article.author}
