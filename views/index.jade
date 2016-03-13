@@ -18,5 +18,6 @@ block content
                 if tag
                     a.tag(href="/tags/#{tag}") #{tag}
         p !{markdown.toHTML(article.content)}
-        p.info 阅读：#{article.pv} | 评论：#{article.comments.length}
+        p.info 阅读：#{article.pv} | 评论：#{article.comments.length} | 转载：#{article.reprint.to?article.reprint.to.length:0}
+
     include paging

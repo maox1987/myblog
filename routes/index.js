@@ -263,13 +263,36 @@ module.exports = function(app){
     });
 
     app.get('/article/:id/remove',checkLogin,function(req,res){
-        Article.remove({_id:req.params.id},function(err,article){
+        Article.findByIdAndRemove(req.params.id,function(err,article){
             if(err){
                 req.flash('error',err);
+                return res.redirect('/');
+            }
+            console.log(article);
+            if(!article.reprint.from){
+                req.flash('success','删除成功！');
+                return res.redirect('/');
+            }
+            Article.findByIdAndUpdate(article.reprint.from,{$pull: {'reprint.to':article._id}},function(err){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('/');
+                }
+                req.flash('success','删除成功！');
+                return res.redirect('/');
+            })
+        })
+    });
+
+    app.get('/article/:id/reprint',checkLogin,function(req,res){
+        Article.reprint(req.params.id,req.session.user.name,function(err,article){
+            if(err){
+                req.flash('error',err);
+                console.log(err);
                 return res.redirect('back');
             }
-            req.flash('success','删除成功！');
-            res.redirect('/');
+            req.flash('success','转载成功！');
+            res.redirect('/article/'+article._id);
         })
     });
 
