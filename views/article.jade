@@ -9,10 +9,19 @@ block content
             a.edit(href="/article/#{article._id}/edit") 编辑
         span
             a.edit(href="/article/#{article._id}/remove") 删除
+        if user
+            span
+                a.edit(href="/article/#{article._id}/reprint") 转载
+
     p.info
         | 作者：
         a(href="/u/#{article.author}") #{article.author}
         | &nbsp;| 日期：#{moment(article.meta.createAt).format('lll')}
+        | &nbsp;| 标签：
+        for tag in article.tags
+            if tag
+                a.tag(href="/tags/#{tag}") #{tag}
     p !{markdown.toHTML(article.content)}
+    p.info 阅读：#{article.pv} | 评论：#{article.comments.length} | 转载：#{article.reprint.to?article.reprint.to.length:0}
     hr
     include comment

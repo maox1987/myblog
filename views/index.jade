@@ -3,12 +3,21 @@
 extends header
 
 block content
-    for item in articles
+    for article in articles
         p
             h2
-                a(href="/article/#{item._id}") #{item.title}
+                a(href="/article/#{article._id}") #{article.title}
+            a(href="/u/#{article.author}")
+                img.r_head(src="#")
         p.info
             | 作者：
-            a(href="/u/#{item.author}") #{item.author}
-            | &nbsp;| 日期：#{moment(item.meta.createAt).format('lll')}
-        p !{markdown.toHTML(item.content)}
+            a(href="/u/#{article.author}") #{article.author}
+            | &nbsp;| 日期： #{moment(article.meta.createAt).format('lll')}
+            | &nbsp;| 标签：
+            for tag in article.tags
+                if tag
+                    a.tag(href="/tags/#{tag}") #{tag}
+        p !{markdown.toHTML(article.content)}
+        p.info 阅读：#{article.pv} | 评论：#{article.comments.length} | 转载：#{article.reprint.to?article.reprint.to.length:0}
+
+    include paging

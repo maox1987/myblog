@@ -1,0 +1,16 @@
+//
+   Created by MaoX on 2016/3/13.
+
+extends header
+
+block content
+    ul.archive
+        -var lastYear =0;
+        for article in articles
+            if lastYear != article.meta.createAt.getFullYear()
+                li
+                    h3 #{article.meta.createAt.getFullYear()}
+                - lastYear=article.meta.createAt.getFullYear()
+            li #{moment(article.meta.createAt).format("lll")}
+            li
+                a(href="/article/#{article._id}") #{article.title}

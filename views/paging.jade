@@ -1,0 +1,11 @@
+//
+   Created by MaoX on 2016/3/13.
+
+br
+div
+    if page.p>0
+        span.prepage
+            a(title="上一页" href="?p=#{page.p-1}") 上一页
+    if page.p<page.max-1
+        span.nextpage
+            a(title="下一页" href="?p=#{page.p+1}") 下一页

@@ -20,18 +20,29 @@ var upload = multer({
 
 module.exports = function(app){
     app.get('/',function(req,res){
-        Article.find({},function(err,articles){
+        var page ={};
+        page.p = parseInt(req.query.p) || 0;
+        page.s = 10;
+        Article.count({},function(err,total){
             if(err){
-                articles =[];
+                return res.send(err);
             }
-            res.render('index',{
-                title:'主页',
-                user:req.session.user,
-                success:req.flash('success').toString(),
-                error:req.flash('error').toString(),
-                articles:articles
+            page.max = Math.ceil(total/page.s);
+            Article.find({}).skip(page.p*page.s).limit(page.s).sort('-meta.createAt').exec(function(err,articles){
+                if(err){
+                    articles =[];
+                }
+                res.render('index',{
+                    title:'主页',
+                    user:req.session.user,
+                    success:req.flash('success').toString(),
+                    error:req.flash('error').toString(),
+                    articles:articles,
+                    page:page
+                });
             });
         });
+
 
     });
 
@@ -167,16 +178,26 @@ module.exports = function(app){
                 return res.redirect('/');
             }
 
-            Article.find({author:user.name},function(err,articles){
+            var page ={};
+            page.p = parseInt(req.query.p) || 0;
+            page.s = 10;
+            Article.count({author:user.name},function(err,total){
                 if(err){
-                    req.flash('error',err);
-                    return res.redirect('/');
+                    return res.send(err);
                 }
-                res.render('user',{
-                    title:user.name,
-                    articles:articles,
-                    success:req.flash('success').toString(),
-                    error:req.flash('error').toString()
+                page.max = Math.ceil(total/page.s);
+                Article.find({author:user.name}).skip(page.p*page.s).limit(page.s).sort('-meta.createAt').exec(function(err,articles){
+                    if(err){
+                        articles =[];
+                    }
+                    res.render('index',{
+                        title:user.name,
+                        user:req.session.user,
+                        success:req.flash('success').toString(),
+                        error:req.flash('error').toString(),
+                        articles:articles,
+                        page:page
+                    });
                 });
             });
         });
@@ -184,7 +205,7 @@ module.exports = function(app){
 
 
     app.get('/article/:id',function(req,res){
-        Article.findOne({_id:req.params.id})
+        Article.findByIdAndUpdate(req.params.id,{$inc:{pv:1}})
             .populate('comments')
             .exec(function(err,article){
             if(err){
@@ -218,25 +239,60 @@ module.exports = function(app){
     });
 
     app.post('/article/:id/edit',checkLogin,function(req,res){
-        var article = req.body.article;
-        Article.update({_id:req.params.id},{$set:article},function(err){
-            if(err){
-                req.flash('error',err);
-                return res.redirect();
-            }
-            req.flash('success','修改成功！');
-            res.redirect('/');
-        });
-    });
-
-    app.get('/article/:id/remove',checkLogin,function(req,res){
-        Article.remove({_id:req.params.id},function(err,article){
+        var _article = req.body.article;
+        Article.findById(req.params.id,function(err,article){
             if(err){
                 req.flash('error',err);
                 return res.redirect('back');
             }
-            req.flash('success','删除成功！');
-            res.redirect('/');
+            if(!article){
+                req.flash('error','文章不存在！');
+                return res.redirect('back');
+            }
+            article.title = _article.title;
+            article.content = _article.content;
+            article.tags = _article.tags;
+            article.save(function(err){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('back');
+                }
+                res.redirect('/');
+            })
+        });
+    });
+
+    app.get('/article/:id/remove',checkLogin,function(req,res){
+        Article.findByIdAndRemove(req.params.id,function(err,article){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('/');
+            }
+            console.log(article);
+            if(!article.reprint.from){
+                req.flash('success','删除成功！');
+                return res.redirect('/');
+            }
+            Article.findByIdAndUpdate(article.reprint.from,{$pull: {'reprint.to':article._id}},function(err){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('/');
+                }
+                req.flash('success','删除成功！');
+                return res.redirect('/');
+            })
+        })
+    });
+
+    app.get('/article/:id/reprint',checkLogin,function(req,res){
+        Article.reprint(req.params.id,req.session.user.name,function(err,article){
+            if(err){
+                req.flash('error',err);
+                console.log(err);
+                return res.redirect('back');
+            }
+            req.flash('success','转载成功！');
+            res.redirect('/article/'+article._id);
         })
     });
 
@@ -244,11 +300,11 @@ module.exports = function(app){
         Article.findById(req.params.id,function(err,article){
             if(err){
                 req.flash('error',err);
-                return res.redirect();
+                return res.redirect('/');
             }
             if(!article){
                 req.flash('error','文章不存在');
-                return res.redirect();
+                return res.redirect('/');
             }
             var comment = new Comment({
                 content:req.body.content,
@@ -272,6 +328,88 @@ module.exports = function(app){
             });
         });
     });
+
+    app.get('/archive',function(req,res){
+
+        Article.find({}).select("_id meta title").sort('-meta.createAt').exec(function(err,articles){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('back');
+            }
+            res.render('archive',{
+                title:'存档',
+                articles:articles,
+                user:req.session.user,
+                success:req.flash('success').toString(),
+                error:req.flash('error').toString()
+            })
+        });
+    });
+
+    app.get('/tags',function(req,res){
+        Article.getTags(function(err,tags){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('back');
+            }
+            res.render('tags',{
+                title:'标签',
+                tags:tags,
+                user:req.session.user,
+                success:req.flash('success').toString(),
+                error:req.flash('error').toString()
+            });
+        });
+    });
+
+    app.get('/tags/:tag',function(req,res){
+        Article.find({tags:req.params.tag}).select('title meta').sort('-meta.createAt')
+            .exec(function(err,articles){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('back');
+                }
+                res.render('tag',{
+                    title:'TAG:'+req.params.tag,
+                    articles:articles,
+                    user:req.session.user,
+                    success:req.flash('success').toString(),
+                    error:req.flash('error').toString()
+                });
+            });
+    });
+
+    app.get('/search',function(req,res){
+        var pattern = new RegExp(req.query.keyword.trim(),'i');
+        Article.find({title:pattern}).select('title meta').sort('-meta.createAt')
+            .exec(function(err,articles){
+                if(err){
+                    req.flash('error',err);
+                    return res.redirect('back');
+                }
+                res.render('search',{
+                    title:'SEARCH:'+req.query.keyword,
+                    articles:articles,
+                    user:req.session.user,
+                    success:req.flash('success').toString(),
+                    error:req.flash('error').toString()
+                });
+            });
+    });
+
+    app.get('/links',function(req,res){
+        res.render('links',{
+            title:'友情链接',
+            user:req.session.user,
+            success:req.flash('success').toString(),
+            error:req.flash('error').toString()
+        });
+    });
+
+    app.use(function(req,res){
+        res.render('404');
+    });
+
     function checkLogin(req,res,next){
         if(!req.session.user){
             req.flash('error','未登录！');

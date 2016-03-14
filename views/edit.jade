@@ -9,6 +9,11 @@ block content
             div 标题：
             input(type="text" name="article[title]" value="#{article.title}")
         div
+            div 标签：
+            div
+                for tag in article.tags
+                    input(type="text" name="article[tags]" value="#{tag}")
+        div
             div 正文：
             textarea(name="article[content]" rows="20" cols="100") #{article.content}
         div
