@@ -30,7 +30,7 @@ var dbUrl = 'mongodb://localhost:27017/blog';
 mongoose.connect(dbUrl);
 
 // 加载数据模型
-var models_path = __dirname+'/models';
+var models_path = __dirname+'/app/models';
 var walk = function(path){
     fs
         .readdirSync(path)
@@ -50,7 +50,7 @@ var walk = function(path){
 walk(models_path);
 
 app.set('port',process.env.PORT || 3000);
-app.set('views', path.join(__dirname,'views'));
+app.set('views', path.join(__dirname,'app/views'));
 app.set('view engine', 'jade');
 
 
